@@ -12,10 +12,10 @@ import (
 
 // IMAPServerValidate handles requests for the /api/imapserver/validate endpoint
 func (as *Server) IMAPServerValidate(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, models.Response{Success: false, Message: "Only POSTs allowed"}, http.StatusBadRequest)
-	case r.Method == "POST":
+	case "POST":
 		im := models.IMAP{}
 		err := json.NewDecoder(r.Body).Decode(&im)
 		if err != nil {
@@ -33,8 +33,8 @@ func (as *Server) IMAPServerValidate(w http.ResponseWriter, r *http.Request) {
 
 // IMAPServer handles requests for the /api/imapserver/ endpoint
 func (as *Server) IMAPServer(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		ss, err := models.GetIMAP(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusInternalServerError)
@@ -43,7 +43,7 @@ func (as *Server) IMAPServer(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, ss, http.StatusOK)
 
 	// POST: Update database
-	case r.Method == "POST":
+	case "POST":
 		im := models.IMAP{}
 		err := json.NewDecoder(r.Body).Decode(&im)
 		if err != nil {

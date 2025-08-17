@@ -15,15 +15,15 @@ import (
 
 // Templates handles the functionality for the /api/templates endpoint
 func (as *Server) Templates(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		ts, err := models.GetTemplates(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
 		}
 		JSONResponse(w, ts, http.StatusOK)
 	//POST: Create a new template and return it as JSON
-	case r.Method == "POST":
+	case "POST":
 		t := models.Template{}
 		// Put the request into a template
 		err := json.NewDecoder(r.Body).Decode(&t)
@@ -65,17 +65,17 @@ func (as *Server) Template(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "Template not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, t, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteTemplate(id, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error deleting template"}, http.StatusInternalServerError)
 			return
 		}
 		JSONResponse(w, models.Response{Success: true, Message: "Template deleted successfully!"}, http.StatusOK)
-	case r.Method == "PUT":
+	case "PUT":
 		t = models.Template{}
 		err = json.NewDecoder(r.Body).Decode(&t)
 		if err != nil {

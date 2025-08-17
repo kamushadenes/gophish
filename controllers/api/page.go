@@ -15,15 +15,15 @@ import (
 
 // Pages handles requests for the /api/pages/ endpoint
 func (as *Server) Pages(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		ps, err := models.GetPages(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
 		}
 		JSONResponse(w, ps, http.StatusOK)
 	//POST: Create a new page and return it as JSON
-	case r.Method == "POST":
+	case "POST":
 		p := models.Page{}
 		// Put the request into a page
 		err := json.NewDecoder(r.Body).Decode(&p)
@@ -59,17 +59,17 @@ func (as *Server) Page(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "Page not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, p, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeletePage(id, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error deleting page"}, http.StatusInternalServerError)
 			return
 		}
 		JSONResponse(w, models.Response{Success: true, Message: "Page Deleted Successfully"}, http.StatusOK)
-	case r.Method == "PUT":
+	case "PUT":
 		p = models.Page{}
 		err = json.NewDecoder(r.Body).Decode(&p)
 		if err != nil {

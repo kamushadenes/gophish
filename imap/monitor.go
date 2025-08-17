@@ -143,7 +143,7 @@ func checkForNewEmails(im models.IMAP) {
 		for _, m := range msgs {
 			// Check if sender is from company's domain, if enabled. TODO: Make this an IMAP filter
 			if im.RestrictDomain != "" { // e.g domainResitct = widgets.com
-				splitEmail := strings.Split(m.Email.From, "@")
+				splitEmail := strings.Split(m.From, "@")
 				senderDomain := splitEmail[len(splitEmail)-1]
 				if senderDomain != im.RestrictDomain {
 					log.Debug("Ignoring email as not from company domain: ", senderDomain)
@@ -154,15 +154,15 @@ func checkForNewEmails(im models.IMAP) {
 			rids, err := matchEmail(m.Email) // Search email Text, HTML, and each attachment for rid parameters
 
 			if err != nil {
-				log.Errorf("Error searching email for rids from user '%s': %s", m.Email.From, err.Error())
+				log.Errorf("Error searching email for rids from user '%s': %s", m.From, err.Error())
 				continue
 			}
 			if len(rids) < 1 {
 				// In the future this should be an alert in Gophish
-				log.Infof("User '%s' reported email with subject '%s'. This is not a GoPhish campaign; you should investigate it.", m.Email.From, m.Email.Subject)
+				log.Infof("User '%s' reported email with subject '%s'. This is not a GoPhish campaign; you should investigate it.", m.From, m.Subject)
 			}
 			for rid := range rids {
-				log.Infof("User '%s' reported email with rid %s", m.Email.From, rid)
+				log.Infof("User '%s' reported email with rid %s", m.From, rid)
 				result, err := models.GetResult(rid)
 				if err != nil {
 					log.Error("Error reporting GoPhish email with rid ", rid, ": ", err.Error())

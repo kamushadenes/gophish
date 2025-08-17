@@ -13,8 +13,8 @@ import (
 
 // Webhooks returns a list of webhooks, both active and disabled
 func (as *Server) Webhooks(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		whs, err := models.GetWebhooks()
 		if err != nil {
 			log.Error(err)
@@ -23,7 +23,7 @@ func (as *Server) Webhooks(w http.ResponseWriter, r *http.Request) {
 		}
 		JSONResponse(w, whs, http.StatusOK)
 
-	case r.Method == "POST":
+	case "POST":
 		wh := models.Webhook{}
 		err := json.NewDecoder(r.Body).Decode(&wh)
 		if err != nil {
@@ -48,11 +48,11 @@ func (as *Server) Webhook(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "Webhook not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, wh, http.StatusOK)
 
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteWebhook(id)
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusInternalServerError)
@@ -61,7 +61,7 @@ func (as *Server) Webhook(w http.ResponseWriter, r *http.Request) {
 		log.Infof("Deleted webhook with id: %d", id)
 		JSONResponse(w, models.Response{Success: true, Message: "Webhook deleted Successfully!"}, http.StatusOK)
 
-	case r.Method == "PUT":
+	case "PUT":
 		wh = models.Webhook{}
 		err = json.NewDecoder(r.Body).Decode(&wh)
 		if err != nil {
@@ -84,8 +84,8 @@ func (as *Server) ValidateWebhook(w http.ResponseWriter, r *http.Request) {
 	type validationEvent struct {
 		Success bool `json:"success"`
 	}
-	switch {
-	case r.Method == "POST":
+	switch r.Method {
+	case "POST":
 		vars := mux.Vars(r)
 		id, _ := strconv.ParseInt(vars["id"], 0, 64)
 		wh, err := models.GetWebhook(id)

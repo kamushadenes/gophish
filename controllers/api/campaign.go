@@ -15,15 +15,15 @@ import (
 // Campaigns returns a list of campaigns if requested via GET.
 // If requested via POST, APICampaigns creates a new campaign and returns a reference to it.
 func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		cs, err := models.GetCampaigns(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
 		}
 		JSONResponse(w, cs, http.StatusOK)
 	//POST: Create a new campaign and return it as JSON
-	case r.Method == "POST":
+	case "POST":
 		c := models.Campaign{}
 		// Put the request into a campaign
 		err := json.NewDecoder(r.Body).Decode(&c)
@@ -47,8 +47,8 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 
 // CampaignsSummary returns the summary for the current user's campaigns
 func (as *Server) CampaignsSummary(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		cs, err := models.GetCampaignSummaries(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
@@ -70,10 +70,10 @@ func (as *Server) Campaign(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "Campaign not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, c, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteCampaign(id)
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error deleting campaign"}, http.StatusInternalServerError)
@@ -104,8 +104,8 @@ func (as *Server) CampaignResults(w http.ResponseWriter, r *http.Request) {
 func (as *Server) CampaignSummary(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 0, 64)
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		cs, err := models.GetCampaignSummary(id, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -125,8 +125,8 @@ func (as *Server) CampaignSummary(w http.ResponseWriter, r *http.Request) {
 func (as *Server) CampaignComplete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 0, 64)
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		err := models.CompleteCampaign(id, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error completing campaign"}, http.StatusInternalServerError)

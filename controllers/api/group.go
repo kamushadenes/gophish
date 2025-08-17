@@ -16,8 +16,8 @@ import (
 // Groups returns a list of groups if requested via GET.
 // If requested via POST, APIGroups creates a new group and returns a reference to it.
 func (as *Server) Groups(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		gs, err := models.GetGroups(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "No groups found"}, http.StatusNotFound)
@@ -25,7 +25,7 @@ func (as *Server) Groups(w http.ResponseWriter, r *http.Request) {
 		}
 		JSONResponse(w, gs, http.StatusOK)
 	//POST: Create a new group and return it as JSON
-	case r.Method == "POST":
+	case "POST":
 		g := models.Group{}
 		// Put the request into a group
 		err := json.NewDecoder(r.Body).Decode(&g)
@@ -51,8 +51,8 @@ func (as *Server) Groups(w http.ResponseWriter, r *http.Request) {
 
 // GroupsSummary returns a summary of the groups owned by the current user.
 func (as *Server) GroupsSummary(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		gs, err := models.GetGroupSummaries(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
@@ -73,17 +73,17 @@ func (as *Server) Group(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "Group not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, g, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteGroup(&g)
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error deleting group"}, http.StatusInternalServerError)
 			return
 		}
 		JSONResponse(w, models.Response{Success: true, Message: "Group deleted successfully!"}, http.StatusOK)
-	case r.Method == "PUT":
+	case "PUT":
 		// Change this to get from URL and uid (don't bother with id in r.Body)
 		g = models.Group{}
 		err = json.NewDecoder(r.Body).Decode(&g)
@@ -109,8 +109,8 @@ func (as *Server) Group(w http.ResponseWriter, r *http.Request) {
 
 // GroupSummary returns a summary of the groups owned by the current user.
 func (as *Server) GroupSummary(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		vars := mux.Vars(r)
 		id, _ := strconv.ParseInt(vars["id"], 0, 64)
 		g, err := models.GetGroupSummary(id, ctx.Get(r, "user_id").(int64))

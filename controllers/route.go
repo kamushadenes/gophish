@@ -247,14 +247,14 @@ func (as *AdminServer) SendingProfiles(w http.ResponseWriter, r *http.Request) {
 
 // Settings handles the changing of settings
 func (as *AdminServer) Settings(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		params := newTemplateParams(r)
 		params.Title = "Settings"
 		session := ctx.Get(r, "session").(*sessions.Session)
 		session.Save(r, w)
 		getTemplate(w, "settings").ExecuteTemplate(w, "base", params)
-	case r.Method == "POST":
+	case "POST":
 		u := ctx.Get(r, "user").(models.User)
 		currentPw := r.FormValue("current_password")
 		newPassword := r.FormValue("new_password")
@@ -362,8 +362,8 @@ func (as *AdminServer) Login(w http.ResponseWriter, r *http.Request) {
 		Token   string
 	}{Title: "Login", Token: csrf.Token(r)}
 	session := ctx.Get(r, "session").(*sessions.Session)
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		params.Flashes = session.Flashes()
 		session.Save(r, w)
 		templates := template.New("template")
@@ -372,7 +372,7 @@ func (as *AdminServer) Login(w http.ResponseWriter, r *http.Request) {
 			log.Error(err)
 		}
 		template.Must(templates, err).ExecuteTemplate(w, "base", params)
-	case r.Method == "POST":
+	case "POST":
 		// Find the user with the provided username
 		username, password := r.FormValue("username"), r.FormValue("password")
 		u, err := models.GetUserByUsername(username)
@@ -436,13 +436,13 @@ func (as *AdminServer) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	params := newTemplateParams(r)
 	params.Title = "Reset Password"
-	switch {
-	case r.Method == http.MethodGet:
+	switch r.Method {
+	case http.MethodGet:
 		params.Flashes = session.Flashes()
 		session.Save(r, w)
 		getTemplate(w, "reset_password").ExecuteTemplate(w, "base", params)
 		return
-	case r.Method == http.MethodPost:
+	case http.MethodPost:
 		newPassword := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
 		newHash, err := auth.ValidatePasswordChange(u.Hash, newPassword, confirmPassword)

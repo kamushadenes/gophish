@@ -15,15 +15,15 @@ import (
 
 // SendingProfiles handles requests for the /api/smtp/ endpoint
 func (as *Server) SendingProfiles(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		ss, err := models.GetSMTPs(ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			log.Error(err)
 		}
 		JSONResponse(w, ss, http.StatusOK)
 	//POST: Create a new SMTP and return it as JSON
-	case r.Method == "POST":
+	case "POST":
 		s := models.SMTP{}
 		// Put the request into a page
 		err := json.NewDecoder(r.Body).Decode(&s)
@@ -59,17 +59,17 @@ func (as *Server) SendingProfile(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "SMTP not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, s, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteSMTP(id, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Error deleting SMTP"}, http.StatusInternalServerError)
 			return
 		}
 		JSONResponse(w, models.Response{Success: true, Message: "SMTP Deleted Successfully"}, http.StatusOK)
-	case r.Method == "PUT":
+	case "PUT":
 		s = models.SMTP{}
 		err = json.NewDecoder(r.Body).Decode(&s)
 		if err != nil {

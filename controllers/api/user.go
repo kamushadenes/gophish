@@ -66,8 +66,8 @@ func (ur *userRequest) Validate(existingUser *models.User) error {
 // Users contains functions to retrieve a list of existing users or create a
 // new user. Users with the ModifySystem permissions can view and create users.
 func (as *Server) Users(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		us, err := models.GetUsers()
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusInternalServerError)
@@ -75,7 +75,7 @@ func (as *Server) Users(w http.ResponseWriter, r *http.Request) {
 		}
 		JSONResponse(w, us, http.StatusOK)
 		return
-	case r.Method == "POST":
+	case "POST":
 		ur := &userRequest{}
 		err := json.NewDecoder(r.Body).Decode(ur)
 		if err != nil {
@@ -144,10 +144,10 @@ func (as *Server) User(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: false, Message: "User not found"}, http.StatusNotFound)
 		return
 	}
-	switch {
-	case r.Method == "GET":
+	switch r.Method {
+	case "GET":
 		JSONResponse(w, existingUser, http.StatusOK)
-	case r.Method == "DELETE":
+	case "DELETE":
 		err = models.DeleteUser(id)
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusInternalServerError)
@@ -155,7 +155,7 @@ func (as *Server) User(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Infof("Deleted user account for %s", existingUser.Username)
 		JSONResponse(w, models.Response{Success: true, Message: "User deleted Successfully!"}, http.StatusOK)
-	case r.Method == "PUT":
+	case "PUT":
 		ur := &userRequest{}
 		err = json.NewDecoder(r.Body).Decode(ur)
 		if err != nil {

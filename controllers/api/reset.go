@@ -10,8 +10,8 @@ import (
 
 // Reset (/api/reset) resets the currently authenticated user's API key
 func (as *Server) Reset(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == "POST":
+	switch r.Method {
+	case "POST":
 		u := ctx.Get(r, "user").(models.User)
 		u.ApiKey = auth.GenerateSecureKey(auth.APIKeyLength)
 		err := models.PutUser(&u)

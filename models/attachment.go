@@ -52,7 +52,7 @@ func (a *Attachment) ApplyTemplate(ptx PhishingTemplateContext) (io.Reader, erro
 	decodedAttachment := base64.NewDecoder(base64.StdEncoding, strings.NewReader(a.Content))
 
 	// If we've already determined there are no template variables in this attachment return it immediately
-	if a.vanillaFile == true {
+	if a.vanillaFile {
 		return decodedAttachment, nil
 	}
 
